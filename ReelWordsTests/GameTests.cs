@@ -103,6 +103,27 @@ namespace ReelWordsTests
         }
 
         [Fact]
+        public void MovesTwoUsedReelsToTheNextLetterUsingTheSameLetter()
+        {
+            var game = new GameBuilder()
+                .WithValidWords("aa")
+                .WithReels(
+                    new Reel(new[] { 'a', 'b', 'c' }, initialPosition: 1),
+                    new Reel(new[] { 'd', 'a', 'f' }, initialPosition: 2),
+                    new Reel(new[] { 'x', 'y', 'z' }, initialPosition: 3))
+                .Build();
+
+            var result = game.SubmitWord("aa");
+
+            var availableLetters = game.GetAvailableLetters().ToArray();
+            Assert.True(result.IsSuccessful);
+            Assert.Equal(3, availableLetters.Length);
+            Assert.Equal('b', availableLetters[0]);
+            Assert.Equal('f', availableLetters[1]);
+            Assert.Equal('z', availableLetters[2]);
+        }
+
+        [Fact]
         public void DoesNotMoveUsedReelsToNextLetterIfSubmissionFailed()
         {
             var game = new GameBuilder()

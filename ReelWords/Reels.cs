@@ -34,14 +34,20 @@ namespace ReelWords
 
         public void MoveReelsUsedToForm(string word)
         {
-            var usedReelPositions = new List<int>();
-            var lettersInReels = AvailableLetters.ToList();
+            const char visitedReelIndexMarker = '\0';
+
+            var availableLetters = AvailableLetters.ToArray();
+            var usedReelIndexes = new HashSet<int>(_reels.Count());
             foreach (var letter in word)
             {
-                usedReelPositions.Add(lettersInReels.IndexOf(letter));
+                var usedIndex = Array.IndexOf(availableLetters, letter);
+
+                usedReelIndexes.Add(usedIndex);
+                availableLetters[usedIndex] = visitedReelIndexMarker;
             }
 
-            foreach (var position in usedReelPositions)
+
+            foreach (var position in usedReelIndexes)
             {
                 var reelToMove = _reels.ElementAt(position);
                 reelToMove.MoveLetterToTop();
