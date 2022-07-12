@@ -20,6 +20,8 @@ namespace ReelWords
         public bool AvailableLettersCanForm(string word)
         {
             var remainingLetters = AvailableLetters.ToList();
+            if (remainingLetters.Count < word.Length)
+                return false;
 
             foreach (var letter in word)
             {
