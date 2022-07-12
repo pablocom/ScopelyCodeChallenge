@@ -20,7 +20,7 @@ namespace ReelWords
             _position = initialPosition;
         }
 
-        public void MoveLetterToTop()
+        public void MoveToNext()
         {
             if (_letters.Length == _position)
                 _position = 1;

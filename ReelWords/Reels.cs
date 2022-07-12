@@ -46,11 +46,10 @@ namespace ReelWords
                 availableLetters[usedIndex] = visitedReelIndexMarker;
             }
 
-
             foreach (var position in usedReelIndexes)
             {
-                var reelToMove = _reels.ElementAt(position);
-                reelToMove.MoveLetterToTop();
+                var reel = _reels.ElementAt(position);
+                reel.MoveToNext();
             }
         }
     }
