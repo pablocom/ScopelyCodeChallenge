@@ -1,148 +1,147 @@
 ﻿using ReelWords;
 using Xunit;
 
-namespace ReelWordsTests
+namespace ReelWordsTests;
+
+public class TrieTests
 {
-    public class TrieTests
+    private const string AWESOME_CO = "pierplay";
+
+    private readonly Trie _trie;
+
+    public TrieTests()
     {
-        private const string AWESOME_CO = "pierplay";
+        _trie = new Trie();
+    }
 
-        private readonly Trie _trie;
+    [Fact]
+    public void TrieInsertTest()
+    {
+        Trie trie = new Trie();
+        trie.Insert(AWESOME_CO);
+        Assert.True(trie.Search(AWESOME_CO));
+    }
 
-        public TrieTests()
-        {
-            _trie = new Trie();
-        }
+    [Fact]
+    public void TrieDeleteTest()
+    {
+        Trie trie = new Trie();
+        trie.Insert(AWESOME_CO);
+        Assert.True(trie.Search(AWESOME_CO));
+        trie.Delete(AWESOME_CO);
+        Assert.False(trie.Search(AWESOME_CO));
+    }
 
-        [Fact]
-        public void TrieInsertTest()
-        {
-            Trie trie = new Trie();
-            trie.Insert(AWESOME_CO);
-            Assert.True(trie.Search(AWESOME_CO));
-        }
+    [Fact]
+    public void DoNotFindWordIfWasNotAdded()
+    {
+        var isWordFound = _trie.Search("NonExistingWord");
 
-        [Fact(Skip = "Pending clarification")]
-        public void TrieDeleteTest()
-        {
-            Trie trie = new Trie();
-            trie.Insert(AWESOME_CO);
-            Assert.True(trie.Search(AWESOME_CO));
-            trie.Delete(AWESOME_CO);
-            Assert.True(trie.Search(AWESOME_CO));
-        }
+        Assert.False(isWordFound);
+    }
 
-        [Fact]
-        public void DoNotFindWordIfWasNotAdded()
-        {
-            var isWordFound = _trie.Search("NonExistingWord");
+    [Fact]
+    public void InsertsOneWord()
+    {
+        var word = "rare";
 
-            Assert.False(isWordFound);
-        }
+        _trie.Insert(word);
 
-        [Fact]
-        public void InsertsOneWord()
-        {
-            var word = "rare";
+        var isWordFound = _trie.Search(word);
+        Assert.True(isWordFound);
+    }
 
-            _trie.Insert(word);
+    [Fact]
+    public void InsertsTwoWordsDifferingTheLastLetter()
+    {
+        var word1 = "cat";
+        var word2 = "cats";
 
-            var isWordFound = _trie.Search(word);
-            Assert.True(isWordFound);
-        }
+        _trie.Insert(word1);
+        _trie.Insert(word2);
 
-        [Fact]
-        public void InsertsTwoWordsDifferingTheLastLetter()
-        {
-            var word1 = "cat";
-            var word2 = "cats";
+        var isWord1Found = _trie.Search(word1);
+        var isWord2Found = _trie.Search(word2);
+        Assert.True(isWord1Found);
+        Assert.True(isWord2Found);
+    }
 
-            _trie.Insert(word1);
-            _trie.Insert(word2);
+    [Fact]
+    public void InsertsTwoTimesTheSameWord()
+    {
+        var word = "cat";
 
-            var isWord1Found = _trie.Search(word1);
-            var isWord2Found = _trie.Search(word2);
-            Assert.True(isWord1Found);
-            Assert.True(isWord2Found);
-        }
+        _trie.Insert(word);
+        _trie.Insert(word);
 
-        [Fact]
-        public void InsertsTwoTimesTheSameWord()
-        {
-            var word = "cat";
+        var isWordFound = _trie.Search(word);
+        Assert.True(isWordFound);
+    }
 
-            _trie.Insert(word);
-            _trie.Insert(word);
+    [Fact]
+    public void DeletesTheOnlyExistingWord()
+    {
+        var wordToBeDeleted = "cat";
+        _trie.Insert(wordToBeDeleted);
 
-            var isWordFound = _trie.Search(word);
-            Assert.True(isWordFound);
-        }
+        _trie.Delete(wordToBeDeleted);
 
-        [Fact]
-        public void DeletesTheOnlyExistingWord()
-        {
-            var wordToBeDeleted = "cat";
-            _trie.Insert(wordToBeDeleted);
+        Assert.False(_trie.Search(wordToBeDeleted));
+    }
 
-            _trie.Delete(wordToBeDeleted);
+    [Fact]
+    public void DeletesASingleWord()
+    {
+        var wordToBeDeleted = "cat";
+        var wordToBePreserved = "bear";
+        _trie.Insert(wordToBeDeleted);
+        _trie.Insert(wordToBePreserved);
 
-            Assert.False(_trie.Search(wordToBeDeleted));
-        }
+        _trie.Delete(wordToBeDeleted);
 
-        [Fact]
-        public void DeletesASingleWord()
-        {
-            var wordToBeDeleted = "cat";
-            var wordToBePreserved = "bear";
-            _trie.Insert(wordToBeDeleted);
-            _trie.Insert(wordToBePreserved);
+        Assert.False(_trie.Search(wordToBeDeleted));
+        Assert.True(_trie.Search(wordToBePreserved));
+    }
 
-            _trie.Delete(wordToBeDeleted);
+    [Fact]
+    public void DeletesWordThatIsASubsequenceOfAnotherPresentWord()
+    {
+        var wordToBeDeleted = "cat";
+        var wordToBePreserved = "cats";
+        _trie.Insert(wordToBeDeleted);
+        _trie.Insert(wordToBePreserved);
 
-            Assert.False(_trie.Search(wordToBeDeleted));
-            Assert.True(_trie.Search(wordToBePreserved));
-        }
+        _trie.Delete(wordToBeDeleted);
 
-        [Fact]
-        public void DeletesWordThatIsASubsequenceOfAnotherPresentWord()
-        {
-            var wordToBeDeleted = "cat";
-            var wordToBePreserved = "cats";
-            _trie.Insert(wordToBeDeleted);
-            _trie.Insert(wordToBePreserved);
+        Assert.False(_trie.Search(wordToBeDeleted));
+        Assert.True(_trie.Search(wordToBePreserved));
+    }
 
-            _trie.Delete(wordToBeDeleted);
+    [Fact]
+    public void DeletesWordThatContainsSubsequenceOfAnotherExistingWord()
+    {
+        var wordToBeDeleted = "cats";
+        var wordToBePreserved = "cat";
+        _trie.Insert(wordToBeDeleted);
+        _trie.Insert(wordToBePreserved);
 
-            Assert.False(_trie.Search(wordToBeDeleted));
-            Assert.True(_trie.Search(wordToBePreserved));
-        }
+        _trie.Delete(wordToBeDeleted);
 
-        [Fact]
-        public void DeletesWordThatContainsSubsequenceOfAnotherExistingWord()
-        {
-            var wordToBeDeleted = "cats";
-            var wordToBePreserved = "cat";
-            _trie.Insert(wordToBeDeleted);
-            _trie.Insert(wordToBePreserved);
+        Assert.False(_trie.Search(wordToBeDeleted));
+        Assert.True(_trie.Search(wordToBePreserved));
+    }
 
-            _trie.Delete(wordToBeDeleted);
+    [Fact]
+    public void DeletesWordWithAnotherPresentSubsequenceInCommon()
+    {
+        var wordToBeDeleted = "paula";
+        var wordToBePreserved = "pablo";
+        _trie.Insert(wordToBeDeleted);
+        _trie.Insert(wordToBePreserved);
 
-            Assert.False(_trie.Search(wordToBeDeleted));
-            Assert.True(_trie.Search(wordToBePreserved));
-        }
+        _trie.Delete(wordToBeDeleted);
 
-        [Fact]
-        public void DeletesWordWithAnotherPresentSubsequenceInCommon()
-        {
-            var wordToBeDeleted = "paula";
-            var wordToBePreserved = "pablo";
-            _trie.Insert(wordToBeDeleted);
-            _trie.Insert(wordToBePreserved);
-
-            _trie.Delete(wordToBeDeleted);
-
-            Assert.False(_trie.Search(wordToBeDeleted));
-            Assert.True(_trie.Search(wordToBePreserved));
-        }
+        Assert.False(_trie.Search(wordToBeDeleted));
+        Assert.True(_trie.Search(wordToBePreserved));
     }
 }

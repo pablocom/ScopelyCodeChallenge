@@ -2,57 +2,56 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ReelWords
+namespace ReelWords;
+
+public class Reels
 {
-    public class Reels
+    private readonly IEnumerable<Reel> _reels;
+    public IEnumerable<char> AvailableLetters => _reels.Select(r => r.CurrentLetter);
+
+    public Reels(IEnumerable<Reel> reels)
     {
-        private readonly IEnumerable<Reel> _reels;
-        public IEnumerable<char> AvailableLetters => _reels.Select(r => r.CurrentLetter);
+        if (reels is null)
+            throw new ArgumentNullException(nameof(reels));
 
-        public Reels(IEnumerable<Reel> reels)
+        _reels = reels;
+    }
+
+    public bool AvailableLettersCanForm(string word)
+    {
+        var remainingLetters = AvailableLetters.ToList();
+        if (remainingLetters.Count < word.Length)
+            return false;
+
+        foreach (var letter in word)
         {
-            if (reels is null)
-                throw new ArgumentNullException(nameof(reels));
-
-            _reels = reels;
-        }
-
-        public bool AvailableLettersCanForm(string word)
-        {
-            var remainingLetters = AvailableLetters.ToList();
-            if (remainingLetters.Count < word.Length)
+            if (!remainingLetters.Contains(letter))
                 return false;
 
-            foreach (var letter in word)
-            {
-                if (!remainingLetters.Contains(letter))
-                    return false;
-
-                remainingLetters.Remove(letter);
-            }
-
-            return true;
+            remainingLetters.Remove(letter);
         }
 
-        public void MoveReelsUsedToForm(string word)
+        return true;
+    }
+
+    public void MoveReelsUsedToForm(string word)
+    {
+        const char visitedReelIndexMarker = '\0';
+
+        var availableLetters = AvailableLetters.ToArray();
+        var usedReelIndexes = new HashSet<int>(_reels.Count());
+        foreach (var letter in word)
         {
-            const char visitedReelIndexMarker = '\0';
+            var usedIndex = Array.IndexOf(availableLetters, letter);
 
-            var availableLetters = AvailableLetters.ToArray();
-            var usedReelIndexes = new HashSet<int>(_reels.Count());
-            foreach (var letter in word)
-            {
-                var usedIndex = Array.IndexOf(availableLetters, letter);
+            usedReelIndexes.Add(usedIndex);
+            availableLetters[usedIndex] = visitedReelIndexMarker;
+        }
 
-                usedReelIndexes.Add(usedIndex);
-                availableLetters[usedIndex] = visitedReelIndexMarker;
-            }
-
-            foreach (var position in usedReelIndexes)
-            {
-                var reel = _reels.ElementAt(position);
-                reel.MoveToNext();
-            }
+        foreach (var position in usedReelIndexes)
+        {
+            var reel = _reels.ElementAt(position);
+            reel.MoveToNext();
         }
     }
 }

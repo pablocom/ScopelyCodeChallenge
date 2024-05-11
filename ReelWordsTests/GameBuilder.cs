@@ -1,34 +1,33 @@
 ﻿using ReelWords;
 using System;
 
-namespace ReelWordsTests
+namespace ReelWordsTests;
+
+public class GameBuilder
 {
-    public class GameBuilder
+    private string[] validWords = Array.Empty<string>();
+    private Reel[] reels = Array.Empty<Reel>();
+
+    public Game Build()
     {
-        private string[] validWords = Array.Empty<string>();
-        private Reel[] reels = Array.Empty<Reel>();
-
-        public Game Build()
+        var trie = new Trie();
+        foreach (var word in validWords)
         {
-            var trie = new Trie();
-            foreach (var word in validWords)
-            {
-                trie.Insert(word);
-            }
-
-            return new Game(trie, new Reels(reels));
+            trie.Insert(word);
         }
 
-        public GameBuilder WithValidWords(params string[] words)
-        {
-            validWords = words;
-            return this;
-        }
+        return new Game(trie, new Reels(reels));
+    }
 
-        public GameBuilder WithReels(params Reel[] reels)
-        {
-            this.reels = reels;
-            return this;
-        }
+    public GameBuilder WithValidWords(params string[] words)
+    {
+        validWords = words;
+        return this;
+    }
+
+    public GameBuilder WithReels(params Reel[] reels)
+    {
+        this.reels = reels;
+        return this;
     }
 }

@@ -1,38 +1,27 @@
-﻿using ReelWords.FileReaders;
-using System;
-using System.IO;
-using System.Threading.Tasks;
+﻿using ReelWords;
+using ReelWords.FileReaders;
 
-namespace ReelWords
+var allEnglishWords = await new EnglishDictionaryReader(File.OpenRead(Path.Combine("Resources", "words_alpha.txt"))).ReadAsync();
+var reels = await new ReelsReader(File.OpenRead(Path.Combine("Resources", "reels.txt"))).ReadAsync();
+
+var game = new Game(allEnglishWords, new Reels(reels));
+
+while (true)
 {
-    class Program
-    {
-        static async Task Main(string[] args)
-        {
-            var allEnglishWords = await new EnglishDictionaryReader(File.OpenRead(Path.Combine("Resources", "american-english-large.txt"))).ReadAsync();
-            var reels = await new ReelsReader(File.OpenRead(Path.Combine("Resources", "reels.txt"))).ReadAsync();
+    Console.WriteLine("Available letters are: " + string.Join(',', game.GetAvailableLetters()));
+    Console.WriteLine("Write '-' to exit");
 
-            var game = new Game(allEnglishWords, new Reels(reels));
+    Console.Write("Type word to guess: ");
 
-            while (true)
-            {
-                Console.WriteLine("Available letters are: " + string.Join(',', game.GetAvailableLetters()));
-                Console.WriteLine("Write '-' to exit");
+    var input = Console.ReadLine();
 
-                Console.Write("Type word to guess: ");
+    if (input == "-")
+        break;
 
-                var input = Console.ReadLine();
+    var result = game.SubmitWord(input);
 
-                if (input == "-")
-                    break;
-
-                var result = game.SubmitWord(input);
-
-                Console.WriteLine(result.Message);
-                Console.WriteLine();
-            }
-
-            Console.WriteLine($"Total score: {game.TotalScore}");
-        }
-    }
+    Console.WriteLine(result.Message);
+    Console.WriteLine();
 }
+
+Console.WriteLine($"Total score: {game.TotalScore}");
